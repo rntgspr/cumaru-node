@@ -1,0 +1,49 @@
+{
+  "name": "@cumaru/cumaru",
+  "version": "0.0.0",
+  "description": "Cumaru CLI for Node.js: give your AI agents roots. A context-oriented framework that turns your repository into a navigable knowledge tree.",
+  "keywords": [
+    "cumaru",
+    "ai",
+    "llm",
+    "ai-agents",
+    "coding-agent",
+    "ai-coding",
+    "agentic",
+    "context-engineering",
+    "context-oriented",
+    "knowledge-tree",
+    "knowledge-base",
+    "spec-driven-development",
+    "sdd",
+    "openspec",
+    "spec-kit",
+    "memory-bank",
+    "claude-code",
+    "codex",
+    "opencode",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "Renato Gaspar",
+  "homepage": "https://github.com/rntgspr/cumaru-node",
+  "repository": "github:rntgspr/cumaru-node",
+  "bin": {
+    "cumaru": "bin/cumaru.js"
+  },
+  "files": [
+    "bin/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "assemble": "node scripts/assemble.mjs"
+  },
+  "optionalDependencies": {
+    "@cumaru/cli-darwin-arm64": "0.0.0",
+    "@cumaru/cli-darwin-x64": "0.0.0",
+    "@cumaru/cli-linux-arm64": "0.0.0",
+    "@cumaru/cli-linux-x64": "0.0.0"
+  }
+}

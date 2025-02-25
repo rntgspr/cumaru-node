@@ -1,0 +1,66 @@
+name: Publish npm
+
+on:
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      version:
+        description: Version to publish (X.Y.Z upstream release, or X.Y.Z-revN wrapper revision)
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish (X.Y.Z upstream release, or X.Y.Z-revN wrapper revision)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VERSION: ${{ inputs.version || github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Validate version
+        run: |
+          [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)(-rev[1-9][0-9]*)?$ ]]
+          echo "UPSTREAM=${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
+
+      - name: Assemble packages
+        run: node scripts/assemble.mjs "$VERSION"
+
+      - name: Smoke-test linux-x64 package
+        run: test "$(CUMARU_BINARY=npm/cli-linux-x64/cumaru node npm/cumaru/bin/cumaru.js --version)" = "cumaru $UPSTREAM"
+
+      # Platform packages go first so the main package never points at missing versions.
+      # --tag latest is explicit because -revN versions are semver prereleases.
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for dir in npm/cli-* npm/cumaru; do
+            name="$(node -p "require('./$dir/package.json').name")"
+            version="$(node -p "require('./$dir/package.json').version")"
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "skip $name@$version (already published)"
+              continue
+            fi
+            (cd "$dir" && npm publish --provenance --access public --tag latest)
+          done
