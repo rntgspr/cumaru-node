@@ -1,0 +1,27 @@
+{
+  "name": "@cumaru/cumaru",
+  "version": "0.0.0",
+  "description": "Node.js wrapper for the Cumaru CLI.",
+  "license": "MIT",
+  "author": "Renato Gaspar",
+  "homepage": "https://github.com/rntgspr/cumaru-node",
+  "repository": "github:rntgspr/cumaru-node",
+  "bin": {
+    "cumaru": "bin/cumaru.js"
+  },
+  "files": [
+    "bin/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "assemble": "node scripts/assemble.mjs"
+  },
+  "optionalDependencies": {
+    "@cumaru/cli-darwin-arm64": "0.0.0",
+    "@cumaru/cli-darwin-x64": "0.0.0",
+    "@cumaru/cli-linux-arm64": "0.0.0",
+    "@cumaru/cli-linux-x64": "0.0.0"
+  }
+}

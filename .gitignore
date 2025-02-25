@@ -1,0 +1,16 @@
+**.DS_Store*
+.env
+.vscode
+node_modules/*
+dist/*
+tsconfig.tsbuildinfo
+!*.gitkeep
+# Cumaru local cache (context vectors); comment out the next line to version it.
+.cumaru/.cache/
+
+# Local agent adapter artifacts (Cumaru hooks and skills)
+.claude/
+CLAUDE.md
+
+# Assembled npm packages (scripts/assemble.mjs output)
+npm/
