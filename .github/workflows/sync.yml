@@ -1,0 +1,39 @@
+name: Sync upstream release
+
+on:
+  repository_dispatch:
+    types: [cumaru-release]
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      VERSION: ${{ github.event.client_payload.version }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - id: check
+        name: Create matching release
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh release view "$VERSION" -R rntgspr/cumaru >/dev/null
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "release $VERSION already exists; nothing to do"
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh release create "$VERSION" --target main --title "Cumaru $VERSION" \
+            --notes "Wraps https://github.com/rntgspr/cumaru/releases/tag/$VERSION"
+          echo "created=true" >> "$GITHUB_OUTPUT"
+
+      # A release created with GITHUB_TOKEN fires no release event, and npm trusted publishing
+      # rejects workflow_call, so publish.yml starts as its own workflow_dispatch run.
+      - name: Start publish
+        if: steps.check.outputs.created == 'true'
+        run: gh workflow run publish.yml --ref main -f version="$VERSION"
+
