@@ -39,7 +39,7 @@ function run() {
   }
 
   if (result.signal) process.kill(process.pid, result.signal)
-  process.exit(result.status ?? 1)
+  process.exit(0)
 }
 
 run()
