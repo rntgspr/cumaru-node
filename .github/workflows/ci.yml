@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+
+      - name: Resolve latest upstream release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "VERSION=$(gh release view -R rntgspr/cumaru --json tagName -q .tagName)" >> "$GITHUB_ENV"
+
+      - name: Assemble packages
+        run: node scripts/assemble.mjs "$VERSION"
+
+      - name: Pack packages
+        run: for dir in npm/*; do (cd "$dir" && npm pack --dry-run); done
+
+      - name: Install and run the wrapper
+        run: |
+          tmp="$(mktemp -d)"
+          (cd npm/cli-linux-x64 && npm pack --pack-destination "$tmp")
+          (cd npm/cumaru && npm pack --pack-destination "$tmp")
+          cd "$tmp"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund ./cumaru-cli-linux-x64-"$VERSION".tgz ./cumaru-cumaru-"$VERSION".tgz
+          test "$(node_modules/.bin/cumaru --version)" = "cumaru $VERSION"
+          set +e
+          node_modules/.bin/cumaru nope >/dev/null 2>&1
+          status=$?
+          set -e
+          test "$status" -eq 2

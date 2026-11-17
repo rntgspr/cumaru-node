@@ -11,3 +11,6 @@ tsconfig.tsbuildinfo
 # Local agent adapter artifacts (Cumaru hooks and skills)
 .claude/
 CLAUDE.md
+
+# Assembled npm packages (scripts/assemble.mjs output)
+npm/

@@ -1,0 +1,62 @@
+name: Publish npm
+
+on:
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      version:
+        description: Upstream cumaru release tag to publish (X.Y.Z)
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Upstream cumaru release tag to publish (X.Y.Z)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VERSION: ${{ inputs.version || github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Validate version
+        run: '[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]'
+
+      - name: Assemble packages
+        run: node scripts/assemble.mjs "$VERSION"
+
+      - name: Smoke-test linux-x64 package
+        run: test "$(CUMARU_BINARY=npm/cli-linux-x64/cumaru node npm/cumaru/bin/cumaru.js --version)" = "cumaru $VERSION"
+
+      # Platform packages go first so the main package never points at missing versions.
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for dir in npm/cli-* npm/cumaru; do
+            name="$(node -p "require('./$dir/package.json').name")"
+            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+              echo "skip $name@$VERSION (already published)"
+              continue
+            fi
+            (cd "$dir" && npm publish --provenance --access public)
+          done
