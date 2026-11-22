@@ -1,7 +1,11 @@
 # @cumaru/cumaru
 
-[![npm](https://img.shields.io/npm/v/@cumaru/cumaru)](https://www.npmjs.com/package/@cumaru/cumaru)
-[![CI](https://github.com/rntgspr/cumaru-node/actions/workflows/ci.yml/badge.svg)](https://github.com/rntgspr/cumaru-node/actions/workflows/ci.yml)
+[![Star](https://img.shields.io/github/stars/rntgspr/cumaru-node?label=star&logo=github)](https://github.com/rntgspr/cumaru-node)
+[![Release](https://img.shields.io/github/v/release/rntgspr/cumaru-node?label=release)](https://github.com/rntgspr/cumaru-node/releases/latest)
+[![License](https://img.shields.io/npm/l/@cumaru/cumaru)](https://www.npmjs.com/package/@cumaru/cumaru)
+[![Tests](https://img.shields.io/github/actions/workflow/status/rntgspr/cumaru-node/ci.yml?branch=main&label=tests&logo=githubactions&logoColor=white)](https://github.com/rntgspr/cumaru-node/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@cumaru/cumaru?logo=npm)](https://www.npmjs.com/package/@cumaru/cumaru)
+[![Sponsor](https://img.shields.io/badge/sponsor-rntgspr-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/rntgspr)
 
 The [Cumaru](https://cumaru.dev) CLI, distributed through npm.
 
